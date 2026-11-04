@@ -1,0 +1,14 @@
+(function(root){
+const clone=s=>JSON.parse(JSON.stringify(s));
+class CloudDocument{
+ constructor({client,storage,validate,initial,onChange=()=>{}}){Object.assign(this,{client,storage,validate,initial,onChange});this.owner=null;this.data=null;this.revision=0;this.pending=false;this.conflict=false;this.flight=null;this.generation=0;this.epoch=0}
+ key(){return 'kapi.account.'+this.owner}
+ attach(id){this.epoch++;this.owner=id;this.data=null;this.revision=0;this.pending=false;this.conflict=false;this.flight=null;this.generation=0;const raw=this.storage.getItem(this.key());if(raw){const c=JSON.parse(raw);this.data=this.validate(c.data);if(!Number.isSafeInteger(c.revision)||c.revision<0)throw Error('Copia local inválida');this.revision=c.revision;this.pending=c.pending===true}return this.data&&clone(this.data)}
+ cache(){if(!this.owner)throw Error('No hay cuenta');this.storage.setItem(this.key(),JSON.stringify({data:this.data,revision:this.revision,pending:this.pending}))}
+ async load(force=false){const epoch=this.epoch,id=this.owner;if(!id)throw Error('Iniciá sesión');const {data,error}=await this.client.from('kapi_documents').select('data,revision').eq('user_id',id).maybeSingle();if(epoch!==this.epoch)throw Error('La cuenta cambió');if(error)throw error;if(this.pending&&!force){if((data?.revision||0)!==this.revision)this.conflict=true;this.onChange();return clone(this.data)}this.data=data?this.validate(data.data):this.validate(this.initial());this.revision=data?.revision||0;this.pending=false;this.conflict=false;this.cache();this.onChange();return clone(this.data)}
+ write(data){if(!this.owner||!this.data)throw Error('Esperá a que termine de cargar tu cuenta');this.data=this.validate(clone(data));this.pending=true;this.generation++;this.cache();this.onChange()}
+ async push(){if(this.flight)return this.flight;if(!this.pending)return;if(this.conflict)throw Error('Hay cambios en otro dispositivo. Revisá el conflicto.');const epoch=this.epoch,id=this.owner,generation=this.generation,payload=clone(this.data),revision=this.revision;if(!id)throw Error('Iniciá sesión');this.flight=(async()=>{const {data,error}=await this.client.rpc('save_kapi',{payload,expected_revision:revision});if(epoch!==this.epoch)throw Error('La cuenta cambió');if(error){if(error.code==='P0001'||/conflicto/i.test(error.message||''))this.conflict=true;this.onChange();throw error}if(!Number.isSafeInteger(data)||data<=revision)throw Error('Revisión de nube inválida');this.revision=data;this.pending=this.generation!==generation;this.cache();this.onChange()})().finally(()=>{if(epoch===this.epoch)this.flight=null});return this.flight}
+ detach({removeCache=false}={}){if(removeCache&&this.owner)this.storage.removeItem(this.key());this.epoch++;this.owner=null;this.data=null;this.pending=false;this.conflict=false;this.flight=null}
+}
+root.CloudDocument=CloudDocument;
+})(typeof window==='undefined'?globalThis:window);

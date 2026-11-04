@@ -12,7 +12,7 @@ const Core=(()=>{
  const sum=(xs,fn)=>xs.reduce((s,x)=>s+fn(x),0);
  const spend=(s,from,to,id)=>sum(s.expenses.filter(e=>e.date>=from&&e.date<to&&(!id||e.budget===id)),e=>bs(e.amount,e.currency,e.rate));
  function bounds(m){let d=parse(m+'-01');d.setMonth(d.getMonth()+1);return {from:m+'-01',to:date(d)}}
- function monthly(s,m){const b=bounds(m);let count=schedule(s.income,b.from,add(b.to,-1)).length;return bs(s.income.amount*count+s.income.extra,s.income.currency,s.rate)}
+ function monthly(s,m){const b=bounds(m);if(s.incomeRules?.length)return sum(s.incomeRules,r=>bs(r.amount*schedule(r,b.from>r.anchor?b.from:r.anchor,add(b.to,-1)).length,r.currency,s.rate))+bs(s.income.extra,s.income.currency,s.rate);let count=schedule(s.income,b.from,add(b.to,-1)).length;return bs(s.income.amount*count+s.income.extra,s.income.currency,s.rate)}
  function prorate(value,from,to){let total=0;for(let d=from;d<to;d=add(d,1)){let dt=parse(d);total+=value/new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate()}return total}
  function available(s,today){const c=cycle(s.income,today);const rate=s.rate;const extra=prorate(bs(s.income.extra,s.income.currency,rate),c.start,c.end);const reserve=prorate(bs(s.income.saving,s.income.currency,rate),c.start,c.end);const spent=spend(s,c.start,add(today,1));const available=bs(s.income.amount,s.income.currency,rate)+extra-reserve-spent;return {...c,extra,reserve,spent,available,remaining:days(today,c.end)}}
  const validDate=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)&&s>='1900-01-01'&&s<='2200-12-31'&&date(parse(s))===s;
