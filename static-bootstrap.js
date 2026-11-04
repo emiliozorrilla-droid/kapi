@@ -1,0 +1,1 @@
+window.KAPI_STATIC_BETA=true;
