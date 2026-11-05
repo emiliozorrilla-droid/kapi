@@ -1,5 +1,5 @@
 window.KAPI_STATIC_BETA=true;
-window.KAPI_RELEASE='4.4.1';
+window.KAPI_RELEASE='4.4.2';
 
 // Public Supabase publishable key. Row security enforces access per user.
 window.KAPI_ACCOUNT_CONFIG={url:'https://spjjbskwuihxgrcqexnt.supabase.co',publicKey:'sb_publishable_3VkhtgYzZEzvvpSK7W_A0w_Vf5-PhUP',aiReady:false,aiProvider:'Groq Free'};
@@ -319,4 +319,16 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkDay()
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',e=>{if(!localStorage.getItem('kapi.theme')){state.theme=e.matches?'dark':'light';render()}});
 function keyboardViewport(){const v=window.visualViewport;document.documentElement.style.setProperty('--keyboard-height',Math.max(0,innerHeight-(v?.height||innerHeight)-(v?.offsetTop||0))+'px')}
 window.visualViewport?.addEventListener('resize',keyboardViewport);keyboardViewport();render();
+
+
+// quick-entry.js
+(function(root){
+function requested(url){try{return new URL(url).searchParams.get('action')==='expense'}catch{return false}}
+function controller({restore,ready,open,blocked}){let flight=null,opened=false;return ()=>{if(opened)return Promise.resolve(true);if(flight)return flight;flight=(async()=>{try{await restore();if(!ready()){blocked();return false}opened=true;open();return true}catch{blocked();return false}finally{flight=null}})();return flight}}
+const api={requested,controller};if(typeof module!=='undefined')module.exports=api;root.KapiQuickEntry=api;
+if(typeof window==='undefined'||!requested(location.href))return;
+function show(){checkDay();go('expenses');expenseModal();const note=document.createElement('div');note.className='notice';note.setAttribute('role','status');note.textContent=session?'Se guardará en tu cuenta cuando confirmes.':'Este gasto se guardará solo en este navegador. Iniciá sesión para sincronizarlo con tu cuenta.';if(!session){const login=document.createElement('button');login.type='button';login.textContent='Iniciar sesión';login.onclick=()=>{$('#modal').close();go('account')};note.append(document.createElement('br'),login)}$('#modal-form').insertBefore(note,$('#modal-form .fields'));requestAnimationFrame(()=>$('#modal input[name="name"]')?.focus());const url=new URL(location.href);url.searchParams.delete('action');history.replaceState(history.state,'',url.href)}
+const run=controller({restore:async()=>{if(accountEnabled&&(accountPromise||localStorage.getItem('kapi.auth.v1')||new URLSearchParams(location.search).has('code')||location.hash.includes('access_token')))await ensureAccount()},ready:()=>!accountLoading&&(!session||cloudReady),open:show,blocked:()=>{go('account');notify('Esperá a que cargue tu cuenta y volvé a abrir el acceso Agregar gasto. No se guardó ningún movimiento.')}});
+queueMicrotask(run);
+})(typeof window==='undefined'?globalThis:window);
 

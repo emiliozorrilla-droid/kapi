@@ -1,4 +1,4 @@
-# KAPI 4.4.1 — entrega local y móvil
+# KAPI 4.4.2 — entrega local y móvil
 
 App: https://emiliozorrilla-droid.github.io/kapi/
 
@@ -27,3 +27,6 @@ Groq Free fue autorizado como alternativa de US$0. No se añadió tarjeta ni pla
 La comprobación en navegador de escritorio con ancho móvil no sustituye teléfonos físicos. Pendientes: instalación y dictado en iPhone/Safari y Chrome Android, modo standalone iOS, micrófono denegado, lector de pantalla y cambio de versión en teléfonos existentes. El dictado no está disponible en todos los navegadores; se ofrece usar el micrófono del teclado.
 
 No hay pagos ni conexión bancaria automática. Los cobros programados solo registran ingresos al abrir la app. No borrar datos del sitio sin respaldo o sincronización confirmada.
+
+## Acceso rápido desde Atajos
+Usar https://emiliozorrilla-droid.github.io/kapi/?action=expense en la acción Abrir URL. Abre directamente Registrar gasto, sin guardar automáticamente. Espera a restaurar la sesión cuando existe; ante fallo de carga de cuenta no abre un formulario anónimo. Si no hay sesión, avisa que el guardado es local. La prueba en Centro de control de un iPhone real sigue pendiente. Se agregaron 4 pruebas de rutas/restauración de sesión, todas aprobadas.
