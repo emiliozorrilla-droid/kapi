@@ -1,4 +1,4 @@
-# KAPI 4.5.1 — cierre mensual y Excel conciliado
+# KAPI 4.5.2 — cierre mensual y Excel conciliado
 
 Ajustes → Cierre mensual. Elegir mes, revisar análisis, Guardar cierre y Descargar cierre Excel. El mes actual se marca como parcial; los meses anteriores se pueden cerrar. Se muestra un aviso en Inicio si el mes anterior tiene movimientos y todavía no tiene cierre. La app no envía correos ni ejecuta procesos estando cerrada.
 
