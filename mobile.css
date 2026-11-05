@@ -4,3 +4,5 @@ html[data-theme=dark]{--bg:#141b18;--panel:#1c2621;--ink:#edf2eb;--muted:#a5b3aa
 .budget-card[data-budget-id]{cursor:pointer}.budget-detail-list{max-height:45dvh;overflow:auto;margin-bottom:16px}.budget-detail-row{display:flex;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.budget-detail-row>div{min-width:0}.budget-detail-row>div:last-child{text-align:right;flex-shrink:0}.budget-detail-row p{margin:4px 0}
 @media(max-width:760px){.toptools .primary{flex:1 0 100%;order:4}input[type=month]{width:190px}}
 @media print{.chat-input,[data-runtime],.ui-icon{display:none!important}.tablewrap tr,.tablewrap td{display:table-row}.tablewrap td{display:table-cell}.tablewrap td::before{display:none}}
+
+.monthly-analysis{margin-top:24px}.monthly-analysis h2{margin-bottom:14px}
